@@ -1,0 +1,167 @@
+﻿@model PMS.Entity.Menu
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>更新菜单</title>
+
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+
+    @using (Ajax.BeginForm("UpdateMenu", "Menu", new AjaxOptions()
+    {
+        OnComplete = "Updatedmenu",
+    }))
+    {
+        <div class="layui-form layui-form-pane" lay-filter="menu" style="padding:20px 15px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单名称<span style="color:red">*</span></label>
+                <div class="layui-input-block">
+                    <input type="text" name="MenuName"  placeholder="输入菜单名称" class="layui-input" style="width:380px" required lay-verify="required" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单图标</label>
+                <div class="layui-input-block">
+                    <input type="text" name="MenuIcon"  placeholder="输入菜单图标" class="layui-input" style="width:380px" />
+                </div>
+            </div>
+
+            @*<div class="layui-form-item">
+
+                    <label class="layui-form-label">全路径<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="text" name="menuname" placeholder="输入全路径" class="layui-input" style="width:380px" />
+                    </div>
+
+                </div>*@
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单链接</label>
+                <div class="layui-input-block">
+                    <input type="text" name="MenuLink"  placeholder="输入菜单链接" class="layui-input" style="width:380px" />
+                </div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序编码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="SortCode"  placeholder="输入排序编码" class="layui-input" style="width:380px" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单描述<span style="color:red;">*</span></label>
+                <div class="layui-input-block">
+                    <input type="text" name="MenuDes"  placeholder="输入菜单描述" class="layui-input" style="width:380px" required lay-verify="required" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="float:right">
+                    <button type="button" id="btnclose" class="layui-btn layui-btn-sm layui-btn-primary" onclick="Closlayers()">
+                        <i class="layui-icon layui-icon-return"></i>
+                        返回
+                    </button>
+                    <button type="submit" id="btnadd" class="layui-btn layui-btn-sm">
+                        <i class="layui-icon layui-icon-ok"></i>
+                        保存
+                    </button>
+                </div>
+            </div>
+            <input type="hidden" value="@ViewBag.menuid" name="MenuId"  id="menuid" /><!--保存所要添加到那个父节点下guid-->
+            
+        </div>
+    }
+
+
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <script>
+
+        layui.config({
+            base: "/Conetnt/extend/"
+        }).extend(
+       {
+           unobtrusive: 'unobtrusive/unobtrusive'
+       });
+
+        layui.use(['element', 'jquery', 'unobtrusive','form'], function () {
+
+            var element = layui.element,
+                $=layui.$,
+                layer = top.layer,
+                unobtrusive = layui.unobtrusive,
+                    form=layui.form;
+
+
+            var menuid=$("#menuid").val();
+            //表单初始化
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: "/Menu/UpdateInit",
+                data:{'menuid':menuid},
+                success: function (result) {
+                    debugger
+
+                    if (result.Code == 0) {
+                        layer.alert(result.Msg,
+                            { icon: 5},
+                            function(index) {
+                                layer.close(index);
+                                Closlayers();
+
+                            });
+                    } else {
+                        form.val('menu',
+                        {
+                            'MenuName': result.Data.MenuName,
+                            'MenuIcon': result.Data.MenuIcon,
+                            'MenuLink': result.Data.MenuLink,
+                            'SortCode': result.Data.SortCode,
+                            'MenuDes': result.Data.MenuDes,
+                        });
+                    }
+                }
+            });
+
+            //添加
+            window.Updatedmenu = function (returndata) {
+
+                if (returndata.responseJSON.Code === 0)//更新失败
+                {
+                    layer.msg(returndata.responseJSON.Msg, { icon: 2, time: 2000 });
+                }
+                else if(returndata.responseJSON.Code === 1)
+                {
+                    layer.alert(returndata.responseJSON.Data, function (index)
+                    {
+                        top["main_Content"].refreshList();
+                        layer.close(index);
+                        Closlayers();
+                    });
+                }
+                else
+                {
+                    layer.alert(returndata.responseJSON.Data);
+                }
+            };
+
+            //关闭弹窗
+            window.Closlayers = function () {
+                var index = layer.getFrameIndex(window.name);
+                layer.close(index);
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+﻿@model PMS.UIModel.Forground.ForProjectUIModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>项目详情</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="margin-left:30px;margin-right:30px;overflow:auto">
+        <div class="layui-layout-admin">
+            <!--头部-->
+            <div class="layui-header">
+                <div class="layui-logo">
+                    <i class="layui-icon layui-icon-group"></i>
+                    学员项目管理系统
+                </div>
+                <ul class="layui-nav layui-layout-right">
+                    <li class="layui-nav-item">
+                        <a href="#">
+                            <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                            @ViewBag.users.UserNickName
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd>
+                                <a href="@string.Format("../Modify/Index?userid={0}",ViewBag.users.UserId)">基本资料</a>
+                            </dd>
+                            <dd>
+                                <a href="@string.Format("../Modify/Index?userid={0}",ViewBag.users.UserId)">修改密码</a>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="#">
+                            <i class="layui-icon layui-icon-release"></i>
+                            退出登陆
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div style="margin-top:20px;">
+                <div style="margin-bottom:20px;float:left;width:100%;">
+                        <div style="float:left;width:50%;">
+                            <img src="@string.Format("../Image/ProImage/{0}.jpg",Model.ProjectIdUIModel)" style="height:300px;width:98%" />
+                        </div>
+                        <div style="float:left;width:50%;height:300px">
+                            <div style="font-size:22px;margin-top:10px;margin-bottom:8px;width:100%">
+                                @Model.ProjectNameUIModel
+                            </div>
+                            <div style="margin-bottom:15px;float:left;width:100%">
+                                <ul style="list-style:none;display:inline">
+                                    <li style="float:left;margin-top:5px;">正在学习 @Model.AttentProCount 人</li>
+                                    <li style="float:left;margin-left:20px;margin-top:5px;">|</li>
+                                    <li style="float:left;margin-left:20px;margin-top:5px;">累计完成 @Model.AlreadyCount 人</li>
+                                    <li style="float:left;margin-left:20px;margin-top:5px;">|</li>
+                                    <li style="float:left;margin-left:20px;margin-top:5px;">优秀评分 @Model.GoodCount 人</li>
+                                </ul>
+
+                            </div>
+                            <div style="font-size:16px;margin-bottom:20px;float:left">
+                                <div style="background-color:darkseagreen;border:1px solid darkseagreen;width:auto;color:#fff">
+                                   @Model.ProjectFrameworkUIModel
+                                </div>
+
+                            </div>
+                            <div style="margin-bottom:20px;float:left;width:100%">
+                                <fieldset style="height:50px;">
+                                    <legend style="font-size:20px">项目编码情况</legend>
+                                    <div style="float:left;font-size:13px;margin-top:5px;">
+                                        代码量：50000行
+                                    </div>
+                                    <div  style="float:left;font-size:13px;margin-top:5px;margin-left:22px">
+                                        预计完成时间：@Model.StudyTimeUIModel 周
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div style="font-size:25px;color:sandybrown;float:left;width:100%">
+                               @Model.ProdifficultyUIModel
+                            </div>
+                            <div style="font-size:25px;color:sandybrown;float:right;margin-right:15px;">
+                               <button class="layui-btn" id="btnapplay" data-href="@Model.ProjectIdUIModel">
+                                   <i class="layui-icon layui-icon-auz"></i>
+                                   立即申请
+                               </button>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+            <div style="margin-top:10px;float:left;width:100%;">
+                <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">老师介绍</li>
+                        <li>项目文档</li>
+                      
+                    </ul>
+                    <div class="layui-tab-content" style="height: 100px;">
+                        <div class="layui-tab-item layui-show">
+                            <div style="float:left;width:20%;">
+                                <img src="@string.Format("../Image/LecturerImage/{0}.jpg",Model.LecturerIdUIModel)" style="height:260px;width:95%" />
+                            </div>
+                            <div style="float:left;width:80%;height:260px">
+                                <div style="font-size:22px;margin-top:5px;margin-bottom:20px;width:100%;float:left">
+                                   @Model.LecturerNameUIModel
+                                </div>
+                                <div style="font-size:12px;margin-bottom:15px;float:left;width:100%;float:left">
+                                    @Model.LecturerIntroduction
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-tab-item" style="overflow-x:hidden" >
+                            @Model.ProjectIntroductionUIModel
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <input type="hidden"  value="@ViewBag.stuid" id="stuid"/>
+        </div>
+       
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <script>
+            layui.use(['element','jquery','layer'], function ()
+            {
+                var element = layui.element,
+                    $=layui.$,
+                    layer=layui.layer;
+
+                var projectid = $("#btnapplay").val();
+                var stuid = $("#stuid").val();
+                $("#btnapplay").click(function ()
+                {
+                  
+                    var projectid = $(this).attr("data-href");
+                    //学生id从登录信息里取
+
+                    $.post("/Project/ApplayPro", { projectid: projectid, studentid: stuid }, function (data, status)
+                    {
+                       
+                        if(data.Code==0)
+                        {
+                            layer.msg(data.Data, { icon: 5, time: 3000 });
+                        }
+                        else if (data.Code == 1)
+                        {
+                            location.href = "/ProjectList/Index";//调转到项目列表页
+                        }
+                        else if(data.Code == 2)
+                        {
+                            layer.msg(data.Data,{ icon: 1, time: 3000 });
+                        }
+                    });
+                });
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+﻿@model PMS.Entity.User
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>编辑用户</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    @using (Ajax.BeginForm("UpdateSave", "User", new AjaxOptions()
+    {
+
+        OnComplete = "updatesave"
+    }))
+
+    {
+        <div style="padding:15px 10px">
+            <div class="layui-form layui-form-pane" lay-filter="user">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户昵称<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="text" name="UserNickName" placeholder="输入用户昵称" class="layui-input" style="width:380px" required lay-verify="required" />
+                    </div>
+                </div>
+                <div class="layui-form-item" pane>
+                    <label class="layui-form-label">性别<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="UserGender" value="0" title="男">
+                        <input type="radio" name="UserGender" value="1" title="女">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手机号码<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="text" name="UserPhoneNumber" placeholder="输入手机号码" class="layui-input" style="width:380px" required lay-verify="required" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">登录密码<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="password" name="UserPwd" placeholder="输入登录密码" class="layui-input" style="width:380px" required lay-verify="required" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户角色<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <select name="RoleId" id="cb_role" lay-filter="aihao">
+                            <option value="">请选择角色</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block" style="float:right">
+                        <button type="button" id="btnclose" class="layui-btn layui-btn-sm layui-btn-primary" onclick="CloseLayer()">
+                            <i class="layui-icon layui-icon-return"></i>
+                            返回
+                        </button>
+                        <button type="submit" id="btnadd" class="layui-btn layui-btn-sm">
+                            <i class="layui-icon layui-icon-ok"></i>
+                            保存
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" value="@ViewBag.userid" id="userid" name="UserId" />
+            </div>
+        </div>
+    }
+
+    <script src="~/Conetnt/layui/layui.js"></script>
+
+    <script>
+
+        layui.config({
+            base: "/Conetnt/extend/"
+        }).extend(
+      {
+          unobtrusive: 'unobtrusive/unobtrusive'
+      });
+
+        layui.use(['form', 'jquery', 'unobtrusive'], function () {
+            var form = layui.form,
+                $ = layui.$,
+                layer = top.layer,
+                    unobtrusive = layui.unobtrusive;
+
+
+            var userid = $("#userid").val();
+
+            $.post("/User/GetSelectLsit", function (data, status) {
+                var $cbrole = $("#cb_role");
+
+                for (var i = 0; i < data.length; i++) {
+                    var option = "<option value='" + data[i].RoleIdUIModel + "'>" + data[i].RoleNameUIModel + "</option>";
+                    $cbrole.append(option);
+                }
+                form.render("select");
+            });
+
+
+            $.ajax(
+                {
+                    type: 'POST',
+                    async: false,
+                    url: "/User/UpdateInit",
+                    data: { 'userid': userid },
+                    error: function (res) {
+                        debugger
+                    },
+                    success: function (result) {
+                        debugger
+                        if (result.Code == 0) {
+                            layer.alert(result.Msg,
+                                { icon: 5 },
+                                function (index) {
+                                    layer.close(index);
+                                    Closlayers();
+                                });
+                        } else {
+                            form.val('user',
+                            {
+                                'UserNickName': result.Data.UserNickNameUIModel,
+                                'UserGender': result.Data.UserGenderUIModel.toString(),
+                                'UserPhoneNumber': result.Data.UserPhoneNumberUIModel,
+                                'UserPwd': result.Data.UserPwdUIModel,
+                                'RoleId': result.Data.RoleIdUIModel,
+                            });
+                        }
+                    }
+                });
+
+
+
+            window.updatesave = function (result) {
+                if (result.responseJSON.Code == 0) {
+                    layer.msg(result.responseJSON.Msg, { icon: 5, time: 2000 });
+                }
+                else if (result.responseJSON.Code == 1) {
+                    layer.alert(result.responseJSON.Data, function (index) {
+                        top["main_Content"].refreshList();
+                        CloseLayer();
+                        layer.close(index);
+                    });
+                }
+                else {
+                    layer.alert(result.responseJSON.Data);
+                }
+
+            };
+
+            //关闭
+            window.CloseLayer = function () {
+                var index = layer.getFrameIndex(window.name);
+                layer.close(index);
+            }
+
+        });
+    </script>
+
+</body>
+</html>

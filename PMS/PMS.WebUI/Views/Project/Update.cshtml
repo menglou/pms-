@@ -1,0 +1,190 @@
+﻿@model PMS.Entity.Project
+
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>修改项目</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    @using (Ajax.BeginForm("UpdateProject", "Project", new AjaxOptions()
+    {
+        OnComplete = "updateprojects"
+
+    }))
+    {
+        <div style="padding:15px 10px">
+            <div class="layui-form layui-form-pane" lay-filter="project">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">项目名称<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="text" name="ProjectName" placeholder="输入项目名称" class="layui-input" required lay-verify="required" />
+                    </div>
+                </div>
+                <div class="layui-form-item" pane>
+                    <label class="layui-form-label">项目框架<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="text" name="ProjectFramework" placeholder="输入项目框架" class="layui-input" required lay-verify="required" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">难度</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="Prodifficulty" placeholder="输入项目难度" class="layui-input" required lay-verify="required" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">学习周期</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="StudyTime" placeholder="输入学习周期" class="layui-input" required lay-verify="required" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">指导老师<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <select name="LecturerId" id="cb_lecturer">
+                            <option value="">请选择指导老师</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">演示地址</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="PalyAddress" placeholder="输入学习周期" class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">项目介绍</label>
+                    <div class="layui-input-block">
+                        <textarea name="ProjectIntroduction" placeholder="输入导师简介" class="layui-textarea" id="projectdes"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block" style="float:right">
+                        <button type="button" id="btnclose" class="layui-btn layui-btn-sm layui-btn-primary" onclick="CloseLayer()">
+                            <i class="layui-icon layui-icon-return"></i>
+                            返回
+                        </button>
+                        <button type="submit" id="btnadd" class="layui-btn layui-btn-sm">
+                            <i class="layui-icon layui-icon-ok"></i>
+                            保存
+                        </button>
+                    </div>
+                </div>
+
+                <input type="hidden" value="@ViewBag.projectid" name="ProjectId" id="projectid" />
+            </div>
+
+        </div>
+    }
+
+    <script src="~/Conetnt/layui/layui.js"></script>
+
+    <script>
+
+        layui.config({
+            base: "/Conetnt/extend/"
+        }).extend(
+           {
+               unobtrusive: 'unobtrusive/unobtrusive'
+           });
+
+        layui.use(['form', 'jquery', 'unobtrusive', 'layedit'], function () {
+            var form = layui.form,
+                layer = top.layer,
+                $ = layui.$,
+                unobtrusive = layui.unobtrusive,
+                    layedit = layui.layedit;
+
+
+            //初始化导师列表
+
+
+            //初始化用户校色
+            $.post("/Project/GetLecturerList", function (data, status) {
+
+                var $cb_lecturer = $("#cb_lecturer");
+
+                for (var i = 0; i < data.length; i++) {
+                    var option = "<option value='" + data[i].LecturerIdUIModel + "'>" + data[i].LecturerNameUIModel + "</option>";
+                    $cb_lecturer.append(option);
+                }
+                form.render("select");
+            });
+
+            var projectid = $("#projectid").val();
+          
+            ///初始化富文本编辑器
+            var index = layedit.build('projectdes', { height: 135 });
+            
+            $.ajax(
+             {
+                 type: 'POST',
+                 async: true,
+                 url: "/Project/UpdateInit",
+                 data: { 'projectid': projectid },
+                 error: function (res) {
+                     debugger
+                 },
+                 success: function (result) {
+
+                     if (result.Code == 0) {
+                         layer.alert(result.Msg,
+                             { icon: 5 },
+                             function (index) {
+                                 layer.close(index);
+                                 Closlayers();
+                             });
+                     } else {
+                         form.val('project',
+                         {
+                             'ProjectName': result.Data.ProjectNameUIModel,
+                             'ProjectFramework': result.Data.ProjectFrameworkUIModel,
+                             'Prodifficulty': result.Data.ProdifficultyUIModel,
+                             'LecturerId': result.Data.LecturerIdUIModel,
+                             'PalyAddress': result.Data.PalyAddressUIModel,
+                             'StudyTime': result.Data.StudyTimeUIModel,
+                             //'ProjectIntroduction': result.Data.ProjectIntroductionUIModel,
+                         });
+                         layedit.setContent(index, result.Data.ProjectIntroductionUIModel);//给富文本编辑器赋值
+                     }
+                 }
+             });
+
+
+            window.updateprojects = function (result) {
+
+                if (result.responseJSON.Code == 0) {
+                    layer.msg(result.responseJSON.Msg, { icon: 5, time: 2000 });
+                }
+                else if (result.responseJSON.Code == 1) {
+                    layer.alert(result.responseJSON.Data, function (index) {
+                        top["main_Content"].refreshList();
+                        CloseLayer();
+                        layer.close(index);
+                    });
+                }
+                else {
+                    layer.alert(result.responseJSON.Data);
+                }
+            };
+
+
+           
+            //关闭
+            window.CloseLayer = function () {
+                var index = layer.getFrameIndex(window.name);
+                layer.close(index);
+            };
+        });
+    </script>
+</body>
+</html>
+

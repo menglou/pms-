@@ -1,0 +1,116 @@
+﻿@model IEnumerable<PMS.UIModel.MenUIModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body class="layui-layout-body">
+    <div class="layui-layout-admin">
+
+        <!--头部-->
+
+        <div class="layui-header">
+            <div class="layui-logo">
+                <i class="layui-icon layui-icon-group"></i>
+                学员项目管理系统
+            </div>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="#">
+                        <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                       @ViewBag.users.UserNickName
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="@string.Format("../Modify/Index?userid={0}",ViewBag.users.UserId)">基本资料</a>
+                        </dd>
+                        <dd>
+                            <a href="@string.Format("../Modify/Index?userid={0}",ViewBag.users.UserId)">修改密码</a>
+                        </dd>u
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="../SysExits/Index">
+                       <i class="layui-icon layui-icon-release"></i>
+                        退出登陆
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!--左侧导航-->
+        <div class="layui-side layui-bg-black">
+
+            <div class="layui-side-scroll">
+                @if (Model.Count() != 0)
+                {
+                    <ul class="layui-nav layui-nav-tree">
+
+                        @foreach (var parantmenu in Model)
+                        {
+                            <li class="layui-nav-item">
+                                <a data-href="@parantmenu.MenuLinkUIModel" data-type="menus">
+                                    <i class="layui-icon @parantmenu.MenuIconUIModel"></i>
+                                    @parantmenu.MenuNameUIModel
+                                </a>
+                                @if (parantmenu.ChildMenuList.Count != 0)
+                                {
+                                    <dl class="layui-nav-child">
+
+                                        @foreach (var chilmenu in parantmenu.ChildMenuList)
+                                        {
+                                            <dd>
+                                                <a data-href="@chilmenu.MenuLinkUIModel" data-type="menus">
+                                                    <i class="layui-icon @chilmenu.MenuIconUIModel"></i>
+                                                    @chilmenu.MenuNameUIModel
+                                                </a>
+                                            </dd>
+                                        }
+                                    </dl>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+
+            </div>
+        </div>
+
+        <!--主区域-->
+        <div class="layui-body" style="overflow: hidden">
+            <iframe name="main_Content" id="main_Content" frameborder="0" style="height: 100%; width: 100%;"></iframe>
+        </div>
+
+        <!--脚注部分-->
+        <div class="layui-footer">
+            @@淮阴工学院
+        </div>
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <script>
+        layui.use(['element','jquery','layer'], function ()
+        {
+            var element = layui.element,
+                $=layui.$,
+                layer = layui.layer;
+
+            
+            $("[data-type='menus']").click(function ()
+            {
+                var $href = $(this).attr("data-href");
+
+                $("#main_Content").attr('src', $href);
+                
+            });
+
+        });
+    </script>
+</body>
+</html>

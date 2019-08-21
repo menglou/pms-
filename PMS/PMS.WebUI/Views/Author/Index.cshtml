@@ -1,0 +1,183 @@
+﻿@model PMS.UIModel.AuthorUIModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="margin-left:15px;margin-right:15px;" >
+        <div>
+            <button class="layui-btn layui-layout-right" id="btnadd" style="margin-right:15px;margin-top:20px;">
+                <i class="layui-icon layui-icon-add-1"></i>
+                添加
+            </button>
+        </div>
+        <div style="margin-top:70px;">
+            <table id="data_author" class="layui-table" lay-filter="table1"></table>
+        </div>
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+
+    <!-- 操作列 -->
+    <script type="text/html" id="oper-col">
+
+        <a class="layui-btn  layui-btn-xs" lay-event="add">
+            <i class="layui-icon layui-icon-add-1"></i>
+            添加子菜单
+        </a>
+
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>
+
+            修改
+        </a>
+        {{# if(!d.IsHavChild){ }}
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="layui-icon layui-icon-delete"></i>
+            删除
+        </a>
+        {{# } }}
+    </script>
+
+    <script>
+
+        layui.config({
+            base: '/Conetnt/extend/'
+        }).extend({
+            treeGrid: 'treegrid/treeGrid',
+            unobtrusive: 'unobtrusive/unobtrusive'
+        });
+
+        layui.use(['treeGrid', 'jquery'], function () {
+            var treeGrid = layui.treeGrid,
+             layer = top.layer,
+                $ = layui.$;
+
+            //初始化树形列表数据
+            treeGrid.render({
+                id: 'data_author',
+                height: 'full',
+                elem: '#data_author',
+                idField: 'AuthorIdUIModel',
+                url: '/Author/GetAuthorExpand',
+                treeId: 'AuthorGuidUIModel',
+                treeUpId: 'ParentGuidUIModel',
+                treeShowName: 'AuthorNameUIModel',
+                page: false,
+                cols: [
+                    [
+                        { field: 'AuthorNameUIModel', title: '权限名称', width: '15%', fixed: 'left', align: 'center' },
+                        { field: 'AuthorTypeUIModel', title: '菜单类型', width: '10%', align: 'center' },
+                        { field: 'ControllerNameUIModel', title: '控制器', width: '10%', align: 'center' },
+                        { field: 'ActionNameUIModel', title: '动作方法', width: '15%', align: 'center' },
+                        { field: 'AuthorPathUIModel', title: '全路径', width: '20%', align: 'center' },
+                        { field: 'operate', title: '操作', toolbar: '#oper-col', width: '30%', align: 'left' }
+                    ]
+                ]
+            });
+
+            //添加一级菜单
+
+            $("#btnadd").click(function () {
+
+                $.post("/Author/IsHaveAuthor", { actionid: 0 }, function (data) {
+                    if (data.Code == 0) {
+                        layer.alert(data.Data);
+                    }
+                    else {
+                        layer.open({
+                            type: 2,
+                            title: '添加权限',
+                            content: ['/Author/Create', 'no'],
+                            area: ['530px', '430px'],
+                            resize: false,
+                        });
+                    }
+                });
+            });
+
+
+            //监听工具条
+            treeGrid.on('tool(table1)', function (obj) {
+
+                var data = obj.data;
+
+                var layevent = obj.event;
+
+                if (layevent == "add") {
+                    $.post("/Author/IsHaveAuthor", { actionid: 0 }, function (res) {
+                        if (res.Code == 0) {
+                            layer.alert(res.Data);
+                        }
+                        else {
+                            layer.open({
+                                type: 2,
+                                title: '添加权限',
+                                content: ['/Author/Create?authorguid=' + data.AuthorGuidUIModel, 'no'],
+                                area: ['530px', '430px'],
+                                resize: false,
+                            });
+                        }
+                    });
+                }
+                else if (layevent == "edit") {
+
+
+                    $.post("/Author/IsHaveAuthor", { actionid: 2 }, function (res) {
+                        if (res.Code == 0) {
+                            layer.alert(res.Data);
+                        }
+                        else {
+                            layer.open({
+                                type: 2,
+                                title: '修改权限',
+                                content: ['/Author/Update?authorid=' + data.AuthorIdUIModel, 'no'],
+                                area: ['530px', '430px'],
+                                resize: false,
+                            });
+                        }
+                    });
+                    
+                }
+                else if (layevent == "del") {
+
+                    $.post("/Author/IsHaveAuthor", { actionid: 4 }, function (res) {
+                        if (res.Code == 0) {
+                            layer.alert(res.Data);
+                        }
+                        else {
+                            layer.confirm("确认删除吗？", { icon: 3, title: '信息提示' }, function (index) {
+
+                                $.post("/Author/Delete", { authorid: data.AuthorIdUIModel }, function (resdata) {
+                                    layer.close(index);
+                                    if (resdata.Code == 0) {
+                                        layer.msg(resdata.Msg, { icon: 5, time: 2000 });
+                                    }
+                                    else {
+                                        refreshList();
+                                    }
+                                });
+
+                            });
+                        }
+                    });
+                }
+            });
+
+            //表格数据刷新
+            window.refreshList = function () {
+                treeGrid.reload('data_author');
+            };
+        });
+    </script>
+
+</body>
+</html>

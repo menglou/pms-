@@ -1,0 +1,100 @@
+﻿
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+    <style type="text/css">
+        #center {
+            width: 400px;
+            height: auto;
+        }
+    </style>
+</head>
+<body style="margin:0;padding:0" id="bodycentyer">
+    <div id="center" style="position:absolute;left:40%;top:20%">
+        <div style="float:left;width:450px;height:500px;">
+            <div style="float:left;font-size:26px;margin-bottom:15px;text-align:center;margin-left:67px;">
+                学员项目管理系统
+            </div>
+            <div style="float:left;font-size:13px;margin-bottom:15px;text-align:center;margin-left:75px;color:#808080">
+                Student Project Manager System
+            </div>
+            <div style="border:1px solid #eee;float:left;width:350px;height:40px;margin-top:15px;">
+                <div style="float:left;margin-top:10px;margin-left:13px;">
+                    <i class="layui-icon layui-icon-cellphone"></i>
+                </div>
+                <div style="float:left;">
+                    <input type="text" id="LoginPhonenum" required lay-verify="required" placeholder="手机号码" class="layui-input" style="border:0px;width:310px" />
+                </div>
+
+            </div>
+            <div style="border:1px solid #eee;float:left;width:350px;height:40px;margin-top:15px;">
+                <div style="float:left;margin-top:10px;margin-left:13px;">
+                    <i class="layui-icon layui-icon-password"></i>
+                </div>
+                <div style="float:left;">
+                    <input type="password" id="loginpwd" required lay-verify="required" placeholder="密码" class="layui-input" style="border:0px;width:310px" />
+                </div>
+
+            </div>
+            <div style="float:left;margin-top:15px;width:100%;font-size:20px;margin-left:5px;">
+                <input type="checkbox" title="记住密码"  style="font-size:30px;">
+            </div>
+            <div style="float:left;margin-top:20px;width:100%;">
+                <button type="button" id="btnlogin" class="layui-btn" style="width:350px">登录</button>
+            </div>
+            <div style="float:left;margin-top:45px;width:100%;margin-left:280px;">
+                <a href="#" style="color:aqua">注册账号</a>
+            </div>
+            <div style="float:left;margin-top:140px;width:100%;margin-left:50px;color:#808080">
+                @@2018 版权所有  喜科堂互联教育
+            </div>
+        </div>
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+
+    <script>
+       
+        if (window.top !== window.self) { //若自身窗口不等于顶层窗口
+            window.top.location.href = window.self.location.href; //顶层窗口跳转到自身窗口
+        }
+
+        layui.use(['element', 'jquery', 'layer'], function () {
+            var element = layui.element,
+                $ = layui.$,
+                layer = layui.layer;
+
+
+
+            $("#btnlogin").click(function () {
+                $.post("/AdminLogin/AdminLogin", { 'loginphonenum': $("#LoginPhonenum").val(), 'loginpwd': $("#loginpwd").val() }, function (data, status) {
+
+                    if (data.Code == 0) {
+                        layer.msg(data.Data, { icon: 5, time: 3000 });
+                    }
+                    else if (data.Code == 1) {
+                        if (data.IsStuent == 0) {
+                            location.href = "/ProjectList/Index";
+                        }
+                        else {
+                            
+                            location.href = "/Home/Index";
+                        }
+                    }
+                    else if (data.Code == 2) {
+                        layer.msg(data.Data, { icon: 5, time: 3000 });
+                    }
+                    else {
+                        layer.alert(data.Data);
+                    }
+                });
+
+            });
+        });
+    </script>
+</body>
+</html>

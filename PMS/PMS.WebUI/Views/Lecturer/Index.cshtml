@@ -1,0 +1,164 @@
+﻿@model PMS.UIModel.LectureUIModel
+
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <div>
+        <div>
+            <button class="layui-btn layui-layout-right" id="btnadd" style="margin-right:15px;margin-top:20px;">
+                <i class="layui-icon layui-icon-add-1"></i>
+                添加
+            </button>
+        </div>
+        <div style="margin-top:70px;margin-left:15px;margin-right:15px;">
+            <table id="data_lecture" class="layui-table" lay-filter="table1"></table>
+        </div>
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <!-- 操作列 -->
+    <script type="text/html" id="oper-col">
+
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>
+            编辑
+        </a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="layui-icon layui-icon-delete"></i>
+            删除
+        </a>
+        <a class="layui-btn  layui-btn-xs" lay-event="btnupload">
+            <i class="layui-icon layui-icon-release"></i>
+            上传图片
+        </a>
+    </script>
+    <script>
+        layui.use(['table','jquery'], function () {
+            var table = layui.table,
+            layer=top.layer,
+                $=layui.$;
+
+            //第一个实例
+            table.render({
+                elem: '#data_lecture',
+                url: '/Lecturer/GetLectureList',
+                toolbar:"default",//数据接,口
+                page: true,//开启分页
+                cols: [[ //表头
+                  { field: 'LecturerNameUIModel', title: '导师姓名', width: '20%', align: 'center' },
+                  { field: 'LecturerPhoneNumberUIModel', title: '手机号码', width: '20%', align: 'center' },
+                  { field: 'LecturerGenderUIModelstr', title: '性别', width: '10%', align: 'center' },
+                  { field: 'CreateTimeUIModelstr', title: '注册时间', width: '20%', align: 'center' },
+                  { field: 'operate', title: '操作', width: '30%', toolbar: "#oper-col", align: 'center' },
+                ]]
+            });
+
+
+            //添加用户
+            $("#btnadd").click(function () {
+
+                $.post("/Lecturer/IsHaveAuthor", { actionid: 0 }, function (res) {
+                    if (res.Code == 0) {
+                        layer.alert(res.Data);
+                    }
+                    else {
+                        layer.open({
+                            type: 2,
+                            title: '添加导师',
+                            content: ['/Lecturer/Create', 'no'],
+                            area: ['530px', '430px'],
+                            resize: false,
+                        });
+                    }
+                });
+
+            });
+
+            table.on('tool(table1)', function (obj) {
+
+                var data = obj.data;
+                var layevent = obj.event;
+
+                if (layevent == "edit")//编辑
+                {
+                    $.post("/Lecturer/IsHaveAuthor", { actionid: 2 }, function (res) {
+                        if (res.Code == 0) {
+                            layer.alert(res.Data);
+                        }
+                        else {
+                            layer.open({
+                                type: 2,
+                                title: '编辑导师',
+                                content: ['/Lecturer/Update?lecturerid=' + data.LecturerIdUIModel, 'no'],
+                                area: ['530px', '430px'],
+                                resize: false,
+                            });
+                        }
+                    });
+
+                    
+                }
+                else if (layevent == "del")//删除
+                {
+                    $.post("/Lecturer/IsHaveAuthor", { actionid: 4 }, function (res) {
+                        if (res.Code == 0) {
+                            layer.alert(res.Data);
+                        }
+                        else {
+                            layer.confirm("确认删除吗？", { icon: 3, title: '信息提示' }, function (index) {
+
+                                $.post("/Lecturer/DeleteLecturer", { lectureid: data.LecturerIdUIModel }, function (resdata) {
+                                   
+                                    layer.close(index);
+
+                                    if (resdata.Code == 0) {
+                                        layer.msg(resdata.Msg, { icon: 5, time: 2000 });
+                                    }
+                                    else {
+                                        refreshList();
+                                    }
+                                });
+
+                            });
+                        }
+                    });
+                }
+                else {
+
+                    $.post("/Lecturer/IsHaveAuthor", { actionid: 5 }, function (res) {
+                        if (res.Code == 0) {
+                            layer.alert(res.Data);
+                        }
+                        else {
+                            layer.open({
+                                type: 2,
+                                title: '上传图片',
+                                content: ['/Lecturer/UploadImage?lecturerid=' + data.LecturerIdUIModel, 'no'],
+                                area: ['450px', '350px'],
+                                resize: false,
+                            });
+                        }
+                    });
+                }
+            });
+
+            //表格数据刷新
+            window.refreshList = function () {
+                table.reload('data_lecture');
+            };
+
+        });
+    </script>
+</body>
+</html>
+

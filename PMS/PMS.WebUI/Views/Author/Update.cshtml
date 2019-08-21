@@ -1,0 +1,165 @@
+﻿@model PMS.Entity.Author
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>添加子菜单</title>
+
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+
+    @using (Ajax.BeginForm("UpdateSave", "Author", new AjaxOptions()
+    {
+        OnComplete = "updatesave",
+    }))
+    {
+        <div class="layui-form layui-form-pane" lay-filter="author" style="padding:20px 15px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限名称<span style="color:red">*</span></label>
+                <div class="layui-input-block">
+                    <input type="text" name="AuthorName" placeholder="输入权限名称" class="layui-input" style="width:380px" required lay-verify="required" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限类型<span style="color:red">*</span></label>
+                <div class="layui-input-block">
+                    <select name="AuthorType" required lay-verify="required">
+                        <option value="">请选择权限类型</option>
+                        <option value="10">其他权限</option>
+                        <option value="20">页面权限</option>
+                        <option value="30">操作权限</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">控制器</label>
+                <div class="layui-input-block">
+                    <input type="text" name="ControllerName" placeholder="输入控制器名称" class="layui-input" style="width:380px" />
+                </div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">动作方法</label>
+                <div class="layui-input-block">
+                    <input type="text" name="ActionName" placeholder="输入动作方法名称" class="layui-input" style="width:380px" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序编码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="AuthorSortCode" placeholder="输入排序编码" class="layui-input" style="width:380px" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限描述<span style="color:red;">*</span></label>
+                <div class="layui-input-block">
+                    <input type="text" name="AuthorDes" placeholder="输入权限描述" class="layui-input" style="width:380px" required lay-verify="required" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="float:right">
+                    <button type="button" id="btnclose" class="layui-btn layui-btn-sm layui-btn-primary" onclick="Closlayers()">
+                        <i class="layui-icon layui-icon-return"></i>
+                        返回
+                    </button>
+                    <button type="submit" id="btnadd" class="layui-btn layui-btn-sm">
+                        <i class="layui-icon layui-icon-ok"></i>
+                        保存
+                    </button>
+                </div>
+            </div>
+            <input type="hidden" id="authId" value="@ViewBag.authorid" name="AuthorId" /><!--保存所要添加到那个父节点下guid-->
+        </div>
+    }
+
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <script>
+
+        layui.config({
+            base: "/Conetnt/extend/"
+        }).extend(
+       {
+           unobtrusive: 'unobtrusive/unobtrusive'
+       });
+
+        layui.use(['element', 'jquery', 'unobtrusive','form'], function () {
+
+            var element = layui.element,
+                $=layui.$,
+                layer = top.layer,
+                unobtrusive = layui.unobtrusive,
+                form=layui.form;
+
+            var authId = $('#authId').val();
+          
+
+            $.ajax({
+                type: "POST",
+                url: "/Author/UpdateInit",
+                data: { 'authorid': authId },
+                success: function (result) {
+                    if (result.Code == 0) {
+                        layer.alert(result.Msg,
+                            { icon: 5},
+                            function(index) {
+                                layer.close(index);
+                                Closlayers();
+                            });
+                    } else {
+
+                        form.val('author',
+                        {
+                            'AuthorName': result.Data.AuthorNameUIModel,
+                            'AuthorType': result.Data.AuthorTypeUIModel,
+                            'ControllerName': result.Data.ControllerNameUIModel,
+                            'ActionName': result.Data.ActionNameUIModel,
+                            'AuthorSortCode': result.Data.AuthorSortCodeUIModel,
+                            'AuthorDes': result.Data.AuthorDesUIModel,
+                        });
+                    }
+                }
+            });
+
+            //添加
+            window.updatesave = function (returndata) {
+
+                if (returndata.responseJSON.Code === 0)//添加失败
+                {
+                    layer.msg(returndata.responseJSON.Msg, { icon: 2, time: 2000 });
+                }
+                else if (returndata.responseJSON.Code === 1)
+                {
+                    layer.alert(returndata.responseJSON.Data, function (index)
+                    {
+                        top["main_Content"].refreshList();
+                        Closlayers();
+                        layer.close(index);
+                    });
+                }
+                else
+                {
+                    layer(returndata.responseJSON.Data);
+                }
+            };
+
+            //关闭弹窗
+            window.Closlayers = function () {
+                var index = layer.getFrameIndex(window.name);
+                layer.close(index);
+            };
+
+        });
+    </script>
+</body>
+</html>

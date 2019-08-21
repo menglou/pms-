@@ -1,0 +1,80 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>上传图片</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="margin-top:12px;margin-left:10px;margin-right:10px;">
+        <div class="layui-upload">
+            <button type="button" class="layui-btn" id="btnupload">上传图片</button>
+            <div class="layui-upload-list">
+                <img class="layui-upload-img" id="demo1" style="width:350px;height:250px;">
+                <p id="demoText"></p>
+            </div>
+        </div>  
+        <input type="hidden"  value="@ViewBag.projectid" id="projectid"/>
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <script>
+          
+        layui.use(['form', 'upload','jquery'], function ()
+        {
+            var form = layui.form,
+                upload = layui.upload,
+                $=layui.$,
+                layer=top.layer;
+
+            var projectid=$("#projectid").val();
+           var datas=null
+            var uploadInst = upload.render(
+                {
+                    elem: '#btnupload',
+                    url: '/Project/UploadImageInService',
+                    data:{projectid:projectid},
+                    before: function (obj)
+                    {
+                        obj.preview(function (index, file, result) {
+                            datas = obj;
+                            $('#demo1').attr('src', result); //图片链接（base64）
+                        });
+                    },
+                    done: function (res)
+                    {
+                        if(res.code==0)
+                        {
+                            layer.msg(res.msg, {icon:5,time:2000})
+                        }
+                        else
+                        {
+                            layer.alert(res.msg, function (index)
+                            {
+                                CloseLayer();
+                                layer.close(index);
+
+                            });
+                        }
+
+                    },
+                    error: function (res)
+                    {
+                        layer.msg(res.msg, { icon: 5, time: 2000 })
+                    },
+                });
+
+            //关闭
+            window.CloseLayer = function () {
+                var index = layer.getFrameIndex(window.name);
+                layer.close(index);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+﻿
+@model PMS.UIModel.StudentUIModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>学员信息</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="padding:15px 10px">
+        <div class="layui-form layui-form-pane" lay-filter="student">
+            <div class="layui-form-item">
+                <label class="layui-form-label">学员姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="StudentName" class="layui-input" readonly="readonly" value="@Model.StudentNameUIModel"  />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">性别</label>
+                <div class="layui-input-block">
+                    <input type="text" name="StudentGender" class="layui-input" readonly="readonly" value="@Model.StudentGenderUIModelstr" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">手机号码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="StudentPhoneNumber" readonly="readonly" value="@Model.StudentPhoneNumberUIModel"  class="layui-input"  />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">所在城市</label>
+                <div class="layui-input-block">
+                    <input type="text" name="City" class="layui-input" readonly="readonly" value="@Model.CityUIModel" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">学历</label>
+                <div class="layui-input-block">
+                    <input type="text" name="StudentPhoneNumber" readonly="readonly" value="@Model.EducationUIModelstr"  class="layui-input"  />
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">学员简介</span></label>
+                <div class="layui-input-block">
+                    @*<input type="text" name="UserPwd" placeholder="输入导师简介" class="layui-input" required lay-verify="required" />*@
+                    <textarea name="Personalrofile"   readonly="readonly" class="layui-textarea" >@Model.PersonalrofileUIModel</textarea>
+                </div>
+            </div>
+            @*<div class="layui-form-item">
+                    <label class="layui-form-label">用户角色<span style="color:red">*</span></label>
+                    <div class="layui-input-block">
+                        <select name="RoleId" id="cb_role">
+                            <option value="">请选择用户角色</option>
+                        </select>
+                    </div>
+                </div>*@
+
+            <input type="hidden" />
+        </div>
+
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <script>
+       
+    </script>
+</body>
+</html>

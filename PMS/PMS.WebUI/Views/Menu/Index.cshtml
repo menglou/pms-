@@ -1,0 +1,162 @@
+﻿
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <div>
+        <div>
+            <button class="layui-btn layui-layout-right" id="btnadd" style="margin-right:15px;margin-top:20px;">
+                <i class="layui-icon layui-icon-add-1"></i>
+                添加
+            </button>
+        </div>
+        <div style="margin-top:70px;margin-left:15px;margin-right:15px;">
+            <table id="data_Menu" class="layui-table" lay-filter="table1"></table>
+        </div>
+    </div>
+    <script src="~/Conetnt/layui/layui.js"></script>
+    <!-- 操作列 -->
+    <script type="text/html" id="oper-col">
+        {{# if(!d.IsParent){ }}
+        <a class="layui-btn  layui-btn-xs" lay-event="add">
+            <i class="layui-icon layui-icon-add-1"></i>
+            添加子菜单
+        </a>
+        {{# } }}
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>
+
+            修改
+        </a>
+        {{# if(!d.IsChild){ }}
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="layui-icon layui-icon-delete"></i>
+            删除
+        </a>
+        {{# } }}
+    </script>
+
+    <script type="text/javascript">
+        layui.config({
+            base: '/Conetnt/extend/'
+        }).extend({
+            treeGrid: 'treegrid/treeGrid',
+            unobtrusive: 'unobtrusive/unobtrusive'
+        });
+
+
+
+
+        layui.use(['treeGrid', 'jquery'], function () {
+            var treeGrid = layui.treeGrid,
+             layer = top.layer,
+                $ = layui.$;
+            debugger;
+            //初始化树形列表数据
+            treeGrid.render({
+                id: 'data_Menu',
+                height: 'full',
+                elem: '#data_Menu',
+                idField: 'MenuIdUIModel',
+                url: '/Menu/GetMenuExpand',
+                treeId: 'MenuGuidUIModel',
+                treeUpId: 'ParentGuidUIModel',
+                treeShowName: 'MenuNameUIModel',
+                page: false,
+                cols: [
+                    [
+                        { field: 'MenuNameUIModel', title: '菜单名称', width: '40%', fixed: 'left' },
+                        { field: 'MenuLinkUIModel', title: '菜单链接', width: '15%' },
+                        { field: 'MenuPathUIModel', title: '全路径', width: '15%' },
+                        { field: 'operate', title: '操作', toolbar: '#oper-col', width: '30%', fixed: 'right' }
+                    ]
+                ]
+            });
+
+            //添加一级菜单
+
+            $("#btnadd").click(function () {
+
+                layer.open({
+                    type: 2,
+                    title: '添加菜单',
+                    content: ['/Menu/Create', 'no'],
+                    area: ['530px', '400px'],
+                    resize: false,
+                });
+            });
+
+
+            //监听工具条
+            treeGrid.on('tool(table1)', function (obj) {
+                var data = obj.data;
+
+                var layevent = obj.event;
+
+                if (layevent == "add") {
+
+                    layer.open({
+                        type: 2,
+                        title: '添加菜单',
+                        content: ['/Menu/Create?menuguid=' + data.MenuGuidUIModel, 'no'],
+                        area: ['530px', '400px'],
+                        resize: false,
+                    });
+
+                }
+                else if (layevent == "edit") {
+                    //$.post("/Menu/IsHaveAuthor", { actionid: 2 }, function (res) {
+                    //    if (res.Code == 0) {
+                    //        layer.alert(res.Data);
+                    //    }
+                    //    else {
+                    layer.open({
+                        type: 2,
+                        title: '修改菜单',
+                        content: ['/Menu/Update?menuid=' + data.MenuIdUIModel, 'no'],
+                        area: ['530px', '400px'],
+                        resize: false,
+                    });
+                    //    }
+                    //});
+                }
+                else if (layevent == "del") {
+
+                    //$.post("/Menu/IsHaveAuthor", { actionid: 4 }, function (res) {
+                    //    if (res.Code == 0) {
+                    //        layer.alert(res.Data);
+                    //    }
+                    //    else {
+                    layer.confirm("确认删除吗？", { icon: 3, title: '信息提示' }, function (index) {
+
+                        $.post("/Menu/Delete", { menuid: data.MenuIdUIModel }, function (resdata) {
+                            layer.close(index);
+                            if (resdata.Code == 0) {
+                                layer.msg(resdata.Msg, { icon: 5, time: 2000 });
+                            }
+                            else {
+                                refreshList();
+                            }
+                        });
+                        //    });
+                        //}
+                    });
+                }
+            });
+
+            //表格数据刷新
+            window.refreshList = function () {
+                treeGrid.reload('data_Menu');
+            };
+        });
+    </script>
+
+
+
+</body>
+</html>

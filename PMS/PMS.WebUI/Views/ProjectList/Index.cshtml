@@ -1,0 +1,185 @@
+﻿
+@model IEnumerable<PMS.UIModel.Forground.ForProjectUIModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>项目列表</title>
+    <link href="~/Conetnt/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body  >
+    <div style="margin-left:30px;margin-right:30px;overflow:auto">
+        <div class="layui-layout-admin">
+            <!--头部-->
+            <div class="layui-header">
+                <div class="layui-logo">
+                    <i class="layui-icon layui-icon-group"></i>
+                    学员项目管理系统
+                </div>
+                <ul class="layui-nav layui-layout-right">
+                    <li class="layui-nav-item">
+                        <a href="#">
+                            <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                            @ViewBag.users.UserNickName
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd>
+                                <a href="@string.Format("../Modify/Index?userid={0}",ViewBag.users.UserId)">基本资料</a>
+                                @*<a href="#">基本资料</a>*@
+                            </dd>
+                            <dd>
+                                <a href="@string.Format("../Modify/Index?userid={0}",ViewBag.users.UserId)">修改密码</a>
+                                @*<a href="#">修改密码</a>*@
+                            </dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="../SysExits/Index">
+                            <i class="layui-icon layui-icon-release"></i>
+                            退出登陆
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!--轮播部分-->
+            <div>
+                <div class="layui-carousel" id="test1" lay-filter="test1">
+                    <div carousel-item="">
+                        <div><img src="~/Image/banner1.jpg" style="width:100%;height:100%"   /></div>
+                        <div><img src="~/Image/banner2.jpg" style="width:100%;height:100%"  /></div>
+                        <div><img src="~/Image/banner3.jpg" style="width:100%;height:100%"   /></div>
+                        <div><img src="~/Image/banner4.jpg" style="width:100%;height:100%"  /></div>
+                        <div><img src="~/Image/banner1.jpg" style="width:100%;height:100%"   /></div>
+                    </div>
+                </div>
+            </div>
+
+            <!--项目列表部分-->
+            <div style="margin-top:20px;">
+                <div style="font-size:20px;margin-bottom:15px;">
+                    结业实战项目
+                </div>
+                <div style="height:1px;background-color:#eee;margin-bottom:15px;float:left;width:100%">
+                </div>
+                   
+                    @if (Model.Count() != 0)
+                    {
+                        foreach (var project in Model)
+                        {
+                             <!--列表信息-->
+                            <div style="margin-bottom:20px;float:left;width:100%">
+                                    <div style="float:left;width:50%;background-color:#eee">
+                                        <img src='@string.Format("../Image/ProImage/{0}.jpg",project.ProjectIdUIModel)' style="height:300px;width:98%" />
+                                    </div>
+                                    <div style="float:left;background-color:#eee;width:50%;height:300px">
+                                        <div style="font-size:22px;margin-top:10px;margin-bottom:20px;width:100%">
+                                            @project.ProjectNameUIModel
+                                        </div>
+                                        <div style="font-size:16px;margin-bottom:20px;float:left;width:100%">
+                                            @project.ProjectFrameworkUIModel
+                                        </div>
+                                        <div style="margin-bottom:50px;float:left;width:100%">
+                                            <ul style="list-style:none;display:inline">
+                                                <li style="float:left"><img src="http://t.cn/RCzsdCq" class="layui-nav-img">@project.LecturerNameUIModel</li>
+                                                <li style="float:left;margin-left:40px;margin-top:5px;">|</li>
+                                                <li style="float:left;margin-left:40px;margin-top:5px;">@project.AttentProCount 人参与</li>
+                                            </ul>
+
+                                        </div>
+                                        <div style="font-size:25px;color:sandybrown;float:left;width:100%">
+                                            @project.ProdifficultyUIModel
+                                        </div>
+                                        <div style="font-size:25px;color:sandybrown;float:right;margin-right:15px;">
+                                            <button class="layui-btn layui-btn-warm" data-href="@project.ProjectIdUIModel" data-type="btnattend">
+                                                <i class="layui-icon layui-icon-auz"></i>
+                                                立即报名
+                                            </button>
+                                        </div>
+                                    </div>
+                            </div>
+                        }
+                    }
+                    <!--列表信息-->
+                    @*<div style="margin-bottom:20px;float:left;width:100%">
+                        <div style="float:left;width:50%;background-color:#eee">
+                            <img src="~/Image/test.png" style="height:300px;width:98%" />
+                        </div>
+                        <div style="float:left;background-color:#eee;width:50%;height:300px">
+                            <div style="font-size:22px;margin-top:10px;margin-bottom:20px;width:100%">
+                                学员项目管理系统
+                            </div>
+                            <div style="font-size:16px;margin-bottom:20px;float:left;width:100%">
+                                ASP.NET-MVC+Layui+codefirst
+                            </div>
+                            <div style="margin-bottom:50px;float:left;width:100%">
+                                <ul style="list-style:none;display:inline">
+                                    <li style="float:left"><img src="http://t.cn/RCzsdCq" class="layui-nav-img">娄猛</li>
+                                    <li style="float:left;margin-left:40px;margin-top:5px;">|</li>
+                                    <li style="float:left;margin-left:40px;margin-top:5px;">10人参与</li>
+                                </ul>
+                                
+                            </div>
+                            <div style="font-size:25px;color:sandybrown;float:left;width:100%">
+                                一般
+                            </div>
+                            <div style="font-size:25px;color:sandybrown;float:right;margin-right:15px;">
+                               <button class="layui-btn layui-btn-warm">
+                                   <i class="layui-icon layui-icon-auz"></i>
+                                   立即报名
+                               </button>
+                            </div>
+                        </div>
+                    </div>*@
+
+              
+                 
+                </div>
+                
+            
+            </div>
+        </div>
+
+       
+    </div>
+  
+    <script src="~/Conetnt/layui/layui.js"></script>
+
+    <script>
+        layui.use(['carousel','jquery','element'], function () {
+
+            var carousel = layui.carousel,
+                $=layui.$,
+                element = layui.element;
+
+            carousel.render({
+                elem: '#test1',
+                width: '100%', //设置容器宽度 
+                arrow: 'always' //始终显示箭头
+                //,anim: 'updown' //切换动画方式
+            });
+
+
+
+            $("[data-type='btnattend']").click(function () {
+
+                var $href = $(this).attr("data-href");
+
+                ////$("#main_Content").attr('src', $href);
+                //$.post("/ProjectList/RedictPreviewProInfo", { projectid: $href }, function (data,status)
+                //{
+
+                //})
+                window.open("/Project/Preview?projectid=" + $href);
+            });
+
+        });
+    </script>
+</body>
+</html>
